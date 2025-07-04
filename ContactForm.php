@@ -55,6 +55,7 @@ function validateEmail($data, $fieldName) {
 
         if (!filter_var($retval, FILTER_VALIDATE_EMAIL)) {
             echo "\"$fieldName\" is not a valid e-mail address.</br>\n";
+            ++$errorCount;
         }
     }
     //Return the empty or correct input value
@@ -66,6 +67,7 @@ function displayForm($Sender, $Email, $Subject, $Message) {
     ?> 
     <!-- Display a centered heading -->
     <h2 style = "text-align: center">Contact Me</h2> 
+    <!-- Send form data to contactform.php using POST method-->
     <form name ="contact" action="ContactForm.php" method="post">
         
         <!-- Name -->
@@ -76,6 +78,10 @@ function displayForm($Sender, $Email, $Subject, $Message) {
         <p>Your Email:
             <input type="text" name="Email" value="<?php echo $Email; ?>"/></php>
         
+        <!-- Subject -->
+        <p>Your Subject:
+            <input type="text" name="Subject" value="<?php echo $Subject; ?>"/></php>
+
         <!-- Message -->
         <p>Message: <br/>
             <textarea name="Message"><?php echo $Message; ?></textarea></php>
@@ -88,5 +94,54 @@ function displayForm($Sender, $Email, $Subject, $Message) {
         
 
 <?php }
+
+//Initialize variables
+$ShowForm = TRUE;
+$errorCount = 0;
+$Sender = '';
+$Email = '';
+$Subject = '';
+$Message = '';
+
+
+//If form was submitted, validate inputs and assign values to variables
+if (isset($_POST['Submit'])) {
+
+    //Validate each field and assign values to variables
+    $Sender = validateInput($_POST['Sender'], "Your Name");
+    $Email = validateEmail($_POST['Email'], "Your E-mail");
+    $Subject = validateInput($_POST['Subject'], "Subject");
+    $Message = validateInput($_POST['Message'], "Message");
+
+    //if there were no errors, don't show form again, otherwise display form again
+    if ($errorCount == 0)
+    $ShowForm = FALSE;
+    else 
+    $ShowForm = TRUE;
+}
+
+//If $ShowForm is true, 
+if ($ShowForm == TRUE) {
+    //if there is an error, display error message and prompt user to reenter info
+    if ($errorCount > 0)
+    echo "<p>Please re-enter the form information below.</p>\n";
+    displayForm($Sender, $Email, $Subject, $Message);
+
+} else 
+    {
+    //if there are no errors, set up sender's address and headers
+    $SenderAddress = "$Sender <$Email>";
+    $Headers = "From: $SenderAddress\nCC: $SenderAddress\n";
+    
+    //Send email using mail() function
+    $result = mail("recipient@example.com", $Subject, $Message, $Headers);
+
+        //If mail was sent successfully, display confirmation and thank you message
+        //otherwise show error message
+        if ($result)
+            echo "<p>Your message has been sent. Thank you, " . $Sender . ".</p>\n";
+        else 
+            echo "<p>There was an error sending your message, " . $Sender . ".</p>\n";
+    }
 ?>
 </html>
