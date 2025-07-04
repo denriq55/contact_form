@@ -113,14 +113,13 @@ if (isset($_POST['Submit'])) {
     $Subject = validateInput($_POST['Subject'], "Subject");
     $Message = validateInput($_POST['Message'], "Message");
 
-    //if there were no errors, don't show form again, otherwise display form again
+    //if there are no errors, don't show form again, otherwise display form again
     if ($errorCount == 0)
     $ShowForm = FALSE;
     else 
     $ShowForm = TRUE;
 }
 
-//If $ShowForm is true, 
 if ($ShowForm == TRUE) {
     //if there is an error, display error message and prompt user to reenter info
     if ($errorCount > 0)
@@ -143,5 +142,32 @@ if ($ShowForm == TRUE) {
         else 
             echo "<p>There was an error sending your message, " . $Sender . ".</p>\n";
     }
+
+    /*
+
+    Reflection:
+    What does each function do? 
+        -validateInput() checks if input is empty, shows an error if it is, and cleans valid input.
+        -validateEmail() checks if email is empty or invalid. 
+        -displayForm() displays the contact form 
+
+    How is user input protected?
+        -Using the POST method keeps user input hidden in the request body
+        -As hackers often insert malicious characters to break code, using filter_var(), trim(), 
+        and stripslashes() protects user input because they basically clean up those characters 
+        (i.e spaces, special characters,etc )
+
+    What were the most confusing parts?
+        -I was confused why the form still submitted even when I purposely 
+        wrote an invalid address. Turns out that in the original code,
+        the error count is only incremented when the email field is empty so i added it. 
+
+    What could be improved?
+        -Increase error count when email is in the wrong format.
+
+    Why send a copy of the form to the sender?
+        -For reassurance and familiarity. Many websites do this so the user can refer
+        to what they wrote later if they want to. 
+    */
 ?>
 </html>
